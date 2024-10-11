@@ -1,0 +1,24 @@
+[package]
+name = "rust_binance_bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+#创建矩阵、向量、熟练掌握矩阵索引
+ndarray = { version = "0.16.1" }
+linfa = "0.7.0"
+linfa-preprocessing = "0.7.0"
+linfa-logistic = {version= "0.7.0" }
+linfa-linear = "0.7.0"  # 如果你需要线性回归等算法
+database = {path = "../database"}
+dotenvy = "0.15.6"
+tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
+binance = { git = "https://github.com/wisespace-io/binance-rs.git" }
+
+ndarray-csv = {version = "0.5.1"}
+csv = {version = "1.1"}
+linfa-bayes={version = "0.7.0"}
+
+#下面框架支持lstm
+tch = "0.17.0"
+

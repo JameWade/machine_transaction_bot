@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = [ "database",
+    "rust_binance_bot",
+#    "database",
+#    "strategy",
+]
+
