@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 #创建矩阵、向量、熟练掌握矩阵索引
-ndarray = { version = "0.16.1" }
+ndarray = { version = "0.15.6" }
 linfa = "0.7.0"
 linfa-preprocessing = "0.7.0"
 linfa-logistic = {version= "0.7.0" }
@@ -20,5 +20,5 @@ csv = {version = "1.1"}
 linfa-bayes={version = "0.7.0"}
 
 #下面框架支持lstm
-tch = "0.17.0"
+#tch = "0.17.0"
 

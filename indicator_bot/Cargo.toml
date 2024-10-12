@@ -1,0 +1,10 @@
+[package]
+name = "indicator_bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dotenvy = "0.15.6"
+tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
+binance = { git = "https://github.com/wisespace-io/binance-rs.git" }
+database = {path = "../database"}

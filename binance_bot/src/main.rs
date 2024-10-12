@@ -1,13 +1,11 @@
 use std::env;
 use binance::model::KlineSummary;
-use csv::ReaderBuilder;
 use dotenvy::dotenv;
 use linfa::Dataset;
 use linfa::metrics::ToConfusionMatrix;
 use linfa::traits::{Fit, Predict};
 use linfa_bayes::GaussianNb;
 use ndarray::{Array, Array1, Array2, ArrayBase, Ix1, Ix2, OwnedRepr, s};
-use ndarray_csv::Array2Reader;
 use database::query_data_from_db;
 //camp model
 #[tokio::main]
@@ -19,7 +17,7 @@ async fn main()-> Result<(), Box<dyn std::error::Error>> {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     let data = query_data_from_db(&database_url).await?;
-    deal_data(data);
+   deal_data(data);
     // data.iter().for_each(|day_data|{
     //     println!("{:?}", day_data);
     //
@@ -67,8 +65,9 @@ fn deal_data(data: Vec<KlineSummary>) {
         training_records.dim().1
     );
 
-    let training_dataset:Dataset<f64, usize, Ix1> = (training_records, y).into();
-
+    let mut training_dataset:Dataset<f64, usize, Ix1> = (training_records, y).into();
+// 打印训练集的目标和特征
+    println!("Training dataset before map_targets:");
     // 创建训练集
     let training_dataset =  training_dataset
         .map_targets(|x| {
@@ -93,7 +92,6 @@ fn deal_data(data: Vec<KlineSummary>) {
     println!("The fitted model has a training f1 score of {}", accuracy);
 
 }
-
 
 
 
