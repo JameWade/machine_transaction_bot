@@ -1,8 +1,9 @@
 [workspace]
 resolver = "2"
-members = [ "database",
-    "rust_binance_bot",
-#    "database",
+members = [
+    "quantification_bot",
+    "database",
+    "machine_bot",
 #    "strategy",
 ]
 

@@ -11,5 +11,5 @@ serde_json = "1.0"
 reqwest = { version = "0.12.7", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 dotenvy = "0.15.6"
-sqlx-cli = "0.8.0"
+sqlx-cli =  { version = "0.8.0"}
 [lib]
