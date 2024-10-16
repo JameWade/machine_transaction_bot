@@ -5,41 +5,67 @@ use tokio::time::Duration as StdDuration;
 use chrono::{DateTime, Duration, Utc};
 use tokio::time::sleep;
 
-pub async  fn get_all_data_from_online(data: Arc<Mutex<Vec<KlineSummary>>>, market: &Market, symbol:&str, interval:&str) -> Result<(), String> {
-    //fetch first time
-    let mut end_time = align_to_next_boundary(Utc::now(),15);
-    let start_time = end_time-Duration::days(7);
-    let mut all_klines =  match market.get_klines(symbol, interval, Some(1000), datetime_to_option_unix_timestamp(start_time), datetime_to_option_unix_timestamp(end_time)) {
-            Ok(kline_summaries) => match kline_summaries {
-                binance::model::KlineSummaries::AllKlineSummaries( kline_vec) => {
-                    println!("kline num:{:?}", kline_vec.len());
-                    kline_vec
-                }
-            },
-            Err(e) => return Err(format!("Failed to get data: {}", e)),
-    };
+pub async fn continuously_fetch_kline_data(
+    data: Arc<Mutex<Vec<KlineSummary>>>,
+    market: &Market,
+    symbol: &str,
+    interval: &str,
+) -> Result<(), String> {
+    let mut end_time = align_to_next_boundary(Utc::now(), 15);
+    let initial_start_time = end_time - Duration::days(7);
+
+    // 初始获取
+    fetch_and_store_klines(data.clone(), market, symbol, interval, initial_start_time, end_time, 1000).await?;
+
 
     loop {
-        //share the data
-        {
-            let mut data_lock = data.lock().unwrap();
-            data_lock.append(&mut all_klines);
-        }
-        //wait internals time
-        sleep(StdDuration::from_mins(15)).await;
-        //fetch some internals
-        let mut last_fetch_time = end_time;
-        end_time = align_to_next_boundary(Utc::now(),15);
-        all_klines =  match market.get_klines(symbol, interval, Some(1), datetime_to_option_unix_timestamp(last_fetch_time), datetime_to_option_unix_timestamp(end_time)) {
-            Ok(kline_summaries) => match kline_summaries {
-                binance::model::KlineSummaries::AllKlineSummaries( kline_vec) => {
-                    println!("kline num:{:?}", kline_vec.len());
-                    kline_vec
-                }
-            },
-            Err(e) => return Err(format!("Failed to get data: {}", e)),
-        };
+        // sleep(StdDuration::from_secs(15 * 60)).await;
+        let last_fetch_time = end_time;
+        end_time = align_to_next_boundary(Utc::now(), 15);
+
+        // 增量获取
+        fetch_and_store_klines(data.clone(), market, symbol, interval, last_fetch_time, end_time, 1).await?;
     }
+}
+async fn fetch_and_store_klines(
+    data: Arc<Mutex<Vec<KlineSummary>>>,
+    market: &Market,
+    symbol: &str,
+    interval: &str,
+    start_time: DateTime<Utc>,
+    end_time: DateTime<Utc>,
+    limit: u16,
+) -> Result<(), String> {
+    let klines = fetch_klines(market, symbol, interval, start_time, end_time, limit).unwrap();
+
+    let mut data_lock = data.lock().unwrap();
+    data_lock.extend(klines);
+
+    Ok(())
+}
+ fn fetch_klines(
+    market: &Market,
+    symbol: &str,
+    interval: &str,
+    start_time: DateTime<Utc>,
+    end_time: DateTime<Utc>,
+    limit: u16,
+) -> Result<Vec<KlineSummary>, String> {
+     let data = match market.get_klines(
+         symbol,
+         interval,
+         Some(limit),
+         datetime_to_option_unix_timestamp(start_time),
+         datetime_to_option_unix_timestamp(end_time),
+     ) {
+         Ok(binance::model::KlineSummaries::AllKlineSummaries(kline_vec)) => {
+             println!("Fetched {} klines", kline_vec.len());
+             Ok(kline_vec)
+         }
+         Err(e) => Err(format!("Failed to get data: {}", e)),
+     };
+     data
+
 }
 /// 根据给定的时间间隔将时间向上取整到最近的边界
 fn align_to_next_boundary(datetime: DateTime<Utc>, interval_minutes: i64) -> DateTime<Utc> {
