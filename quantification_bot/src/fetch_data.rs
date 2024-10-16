@@ -5,7 +5,7 @@ use tokio::time::Duration as StdDuration;
 use chrono::{DateTime, Duration, Utc};
 use tokio::time::sleep;
 
-pub async fn continuously_fetch_kline_data(
+pub    fn continuously_fetch_kline_data(
     data: Arc<Mutex<Vec<KlineSummary>>>,
     market: &Market,
     symbol: &str,
@@ -13,21 +13,24 @@ pub async fn continuously_fetch_kline_data(
 ) -> Result<(), String> {
     let mut end_time = align_to_next_boundary(Utc::now(), 15);
     let initial_start_time = end_time - Duration::days(7);
-
+    let rt = tokio::runtime::Builder::new_current_thread()
+     .enable_all()
+     .build().unwrap();
     // 初始获取
-    fetch_and_store_klines(data.clone(), market, symbol, interval, initial_start_time, end_time, 1000).await?;
+    fetch_and_store_klines(data.clone(), market, symbol, interval, initial_start_time, end_time, 1000)?;
 
 
     loop {
         // sleep(StdDuration::from_secs(15 * 60)).await;
+        rt.block_on(wait_15m());
         let last_fetch_time = end_time;
         end_time = align_to_next_boundary(Utc::now(), 15);
 
         // 增量获取
-        fetch_and_store_klines(data.clone(), market, symbol, interval, last_fetch_time, end_time, 1).await?;
+        fetch_and_store_klines(data.clone(), market, symbol, interval, last_fetch_time, end_time, 1)?;
     }
 }
-async fn fetch_and_store_klines(
+ pub fn fetch_and_store_klines(
     data: Arc<Mutex<Vec<KlineSummary>>>,
     market: &Market,
     symbol: &str,
@@ -43,7 +46,7 @@ async fn fetch_and_store_klines(
 
     Ok(())
 }
- fn fetch_klines(
+ pub fn fetch_klines(
     market: &Market,
     symbol: &str,
     interval: &str,
@@ -68,7 +71,7 @@ async fn fetch_and_store_klines(
 
 }
 /// 根据给定的时间间隔将时间向上取整到最近的边界
-fn align_to_next_boundary(datetime: DateTime<Utc>, interval_minutes: i64) -> DateTime<Utc> {
+pub fn align_to_next_boundary(datetime: DateTime<Utc>, interval_minutes: i64) -> DateTime<Utc> {
     let interval_seconds = interval_minutes * 60; // 转换为秒
     let seconds = datetime.timestamp() % interval_seconds; // 计算余数
 
@@ -81,4 +84,8 @@ fn align_to_next_boundary(datetime: DateTime<Utc>, interval_minutes: i64) -> Dat
 // 将 DateTime<Utc> 转换为 Option<u64>
 fn datetime_to_option_unix_timestamp(dt: DateTime<Utc>) -> Option<u64> {
     Some(dt.timestamp_millis() as u64)
+}
+
+async fn wait_15m(){
+    sleep(StdDuration::from_secs(15 * 60)).await;
 }
