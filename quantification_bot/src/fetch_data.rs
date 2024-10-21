@@ -6,7 +6,7 @@ use binance::websockets::{WebsocketEvent, WebSockets};
 use tokio::time::Duration as StdDuration;
 use chrono::{DateTime, Duration, Utc};
 use tokio::time::sleep;
-use crate::kline_4h::{Kline4hCallback, KlineData4h};
+use crate::kline_4h::{Kline4hCallback, KlineData};
 
 pub    fn continuously_fetch_kline_data(
     data: Arc<Mutex<Vec<KlineSummary>>>,
@@ -61,7 +61,8 @@ pub    fn continuously_fetch_kline_data(
          symbol,
          interval,
          Some(limit),
-         datetime_to_option_unix_timestamp(start_time),
+         //datetime_to_option_unix_timestamp(start_time),
+         None,
          datetime_to_option_unix_timestamp(end_time),
      ) {
          Ok(binance::model::KlineSummaries::AllKlineSummaries(kline_vec)) => {
@@ -92,14 +93,13 @@ fn datetime_to_option_unix_timestamp(dt: DateTime<Utc>) -> Option<u64> {
 async fn wait_15m(){
     sleep(StdDuration::from_secs(15 * 60)).await;
 }
-pub fn ws_fetch_current_kline4h(kline_data_4h:&mut KlineData4h,callback:Kline4hCallback){
+pub fn ws_fetch_current_kline4h(kline_data_4h:&mut KlineData, callback:Kline4hCallback){
     // 启动 WebSocket 监听
     let keep_running = AtomicBool::new(true); // Used to control the event loop
-    let kline = format!("{}", "btcusdt@kline_4h");
+    let kline = format!("{}", "btcusdt@kline_15m");
     let mut web_socket = WebSockets::new(|event: WebsocketEvent| {
         match event {
             WebsocketEvent::Kline(kline_event) => {
-                println!("new message");
                 println!("Symbol: {}, high: {}, low: {}", kline_event.kline.symbol, kline_event.kline.low, kline_event.kline.high);
                 callback(kline_data_4h, kline_event.kline);
             },
