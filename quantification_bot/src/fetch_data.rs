@@ -107,7 +107,6 @@ pub fn ws_fetch_current_kline4h(kline_data_4h:&mut KlineData, callback:Kline4hCa
         };
         Ok(())
     });
-
     web_socket.connect(&kline).unwrap(); // check error
     if let Err(e) = web_socket.event_loop(&keep_running) {
         match e {
