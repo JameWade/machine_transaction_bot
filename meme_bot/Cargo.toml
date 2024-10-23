@@ -1,0 +1,17 @@
+[package]
+name = "meme_bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0.213", features = ["derive"] }
+solana-sdk = "2.0.13"
+solana-client="2.0.13"
+tokio = "1.39.3"
+anchor-lang = "0.30.1"
+spl-token = "6.0.0"
+spl-associated-token-account = "5.0.1"
+borsh = "1.5.1"
+async-trait = "0.1.81"
+chrono = "0.4.38"
+rust_decimal = { version = "1.26", features = ["serde"] }

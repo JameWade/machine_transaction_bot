@@ -50,10 +50,10 @@ fn process_kline_data4h(kline_data:&mut KlineData, kline: Kline){
     // backtest_result.evaluate_signal(data_ema20, data_ema55, *rsi, close_price);
     // backtest_result.print_result();
 
-    let strategy = Box::new(RangeStrategy::new(90.0, 110.0));
+    let strategy = Box::new(RangeStrategy::new(66400.0, 66550.0));
     let mut backtest = Backtest::new(strategy);
-    let close_value: &str = &kline.close; // 通过引用获取数据
-    let close = close_value.parse::<f64>().unwrap(); // 解析，依然保留 `kline.close`
+    let close_value: &str = &kline.close;
+    let close = close_value.parse::<f64>().unwrap();
     let result = backtest.run(close);
     result.print_result();
 }
