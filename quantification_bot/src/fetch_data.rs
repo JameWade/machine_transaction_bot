@@ -96,7 +96,7 @@ async fn wait_15m(){
 pub fn ws_fetch_current_kline4h(kline_data_4h:&mut KlineData, callback:Kline4hCallback){
     // 启动 WebSocket 监听
     let keep_running = AtomicBool::new(true); // Used to control the event loop
-    let kline = format!("{}", "btcusdt@kline_15m");
+    let kline = format!("{}", "btcusdt@kline_5m");
     let mut web_socket = WebSockets::new(|event: WebsocketEvent| {
         match event {
             WebsocketEvent::Kline(kline_event) => {

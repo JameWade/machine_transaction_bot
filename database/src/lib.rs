@@ -1,11 +1,11 @@
-// use binance::api::Binance;
+use binance::api::Binance;
 // use binance::market::Market;
 // use binance::model::KlineSummary;
 // use sqlx::mysql::{MySqlPoolOptions, MySqlRow};
 // use dotenvy::dotenv;
 // use std::env;
 // use sqlx::Row;
-// use tokio::task;
+use tokio::task;
 //
 // #[cfg_attr(not(debug_assertions), allow(dead_code))]
 // #[derive(Debug)]
@@ -34,7 +34,7 @@
 //     pub taker_buy_quote_asset_volume: Option<String>,
 // }
 //
-// //https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=1346198400000&endTime=1704067200000&limit=1000
+//https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=1346198400000&endTime=1704067200000&limit=1000
 // #[tokio::main]
 // async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //     println!("########GET BTC PRICE!##############");
@@ -60,7 +60,7 @@
 //     println!("Data processing completed successfully");
 //     Ok(())
 // }
-//
+
 // fn get_data_from_online(market: &Market) -> Result<Vec<KlineSummary>, binance::errors::Error> {
 //     // last 10 1-day klines (candlesticks) for a symbol:
 //     let klines = market.get_klines("BTCUSDT", "1d", None, None, None)?;
