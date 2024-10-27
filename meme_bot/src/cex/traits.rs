@@ -1,4 +1,5 @@
 use std::error::Error;
+use crate::OrderSide;
 
 pub trait CexInterface {
     async fn get_price(&self, symbol: &str) -> Result<f64, Box<dyn Error>>;
